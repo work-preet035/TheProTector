@@ -1,0 +1,392 @@
+openapi: 3.1.0
+info:
+  # Do not change the title, if the title changes, the import paths will be broken
+  title: Api
+  version: 0.1.0
+  description: WiZzryptic API - Professional Cryptography Toolkit
+servers:
+  - url: /api
+    description: Base API path
+tags:
+  - name: health
+    description: Health operations
+  - name: cipher
+    description: Cipher operations
+paths:
+  /healthz:
+    get:
+      operationId: healthCheck
+      tags: [health]
+      summary: Health check
+      description: Returns server health status
+      responses:
+        "200":
+          description: Healthy
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthStatus"
+
+  /cipher/caesar:
+    post:
+      operationId: caesarCipher
+      tags: [cipher]
+      summary: Caesar Cipher encrypt/decrypt
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CaesarRequest"
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CipherResult"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /cipher/rot13:
+    post:
+      operationId: rot13Cipher
+      tags: [cipher]
+      summary: ROT13 encode/decode
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SimpleTextRequest"
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CipherResult"
+
+  /cipher/vigenere:
+    post:
+      operationId: vigenereCipher
+      tags: [cipher]
+      summary: Vigenere Cipher encrypt/decrypt
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/VigenereRequest"
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CipherResult"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /cipher/base64:
+    post:
+      operationId: base64Cipher
+      tags: [cipher]
+      summary: Base64 encode/decode
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Base64Request"
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CipherResult"
+
+  /cipher/atbash:
+    post:
+      operationId: atbashCipher
+      tags: [cipher]
+      summary: Atbash Cipher encrypt/decrypt
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SimpleTextRequest"
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CipherResult"
+
+  /cipher/analyze:
+    post:
+      operationId: analyzeText
+      tags: [cipher]
+      summary: Frequency analysis of ciphertext
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SimpleTextRequest"
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FrequencyAnalysisResult"
+
+  /cipher/history:
+    get:
+      operationId: getCipherHistory
+      tags: [cipher]
+      summary: Get recent cipher operations
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CipherHistoryResponse"
+
+    delete:
+      operationId: clearCipherHistory
+      tags: [cipher]
+      summary: Clear cipher history
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+
+  /cipher/stats:
+    get:
+      operationId: getCipherStats
+      tags: [cipher]
+      summary: Get aggregate cipher usage statistics
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CipherStats"
+
+components:
+  schemas:
+    HealthStatus:
+      type: object
+      properties:
+        status:
+          type: string
+      required:
+        - status
+
+    CaesarRequest:
+      type: object
+      properties:
+        text:
+          type: string
+        shift:
+          type: integer
+          minimum: 1
+          maximum: 25
+        mode:
+          type: string
+          enum: [encrypt, decrypt]
+      required:
+        - text
+        - shift
+        - mode
+
+    VigenereRequest:
+      type: object
+      properties:
+        text:
+          type: string
+        key:
+          type: string
+        mode:
+          type: string
+          enum: [encrypt, decrypt]
+      required:
+        - text
+        - key
+        - mode
+
+    Base64Request:
+      type: object
+      properties:
+        text:
+          type: string
+        mode:
+          type: string
+          enum: [encode, decode]
+      required:
+        - text
+        - mode
+
+    SimpleTextRequest:
+      type: object
+      properties:
+        text:
+          type: string
+      required:
+        - text
+
+    CipherResult:
+      type: object
+      properties:
+        input:
+          type: string
+        output:
+          type: string
+        algorithm:
+          type: string
+        mode:
+          type: string
+        timestamp:
+          type: string
+      required:
+        - input
+        - output
+        - algorithm
+        - mode
+        - timestamp
+
+    FrequencyEntry:
+      type: object
+      properties:
+        char:
+          type: string
+        count:
+          type: integer
+        percentage:
+          type: number
+      required:
+        - char
+        - count
+        - percentage
+
+    FrequencyAnalysisResult:
+      type: object
+      properties:
+        text:
+          type: string
+        totalChars:
+          type: integer
+        alphabeticChars:
+          type: integer
+        frequencies:
+          type: array
+          items:
+            $ref: "#/components/schemas/FrequencyEntry"
+        mostCommon:
+          type: string
+        suggestedShift:
+          type: integer
+      required:
+        - text
+        - totalChars
+        - alphabeticChars
+        - frequencies
+        - mostCommon
+        - suggestedShift
+
+    CipherHistoryItem:
+      type: object
+      properties:
+        id:
+          type: string
+        algorithm:
+          type: string
+        mode:
+          type: string
+        input:
+          type: string
+        output:
+          type: string
+        timestamp:
+          type: string
+      required:
+        - id
+        - algorithm
+        - mode
+        - input
+        - output
+        - timestamp
+
+    CipherHistoryResponse:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/CipherHistoryItem"
+        total:
+          type: integer
+      required:
+        - items
+        - total
+
+    CipherStats:
+      type: object
+      properties:
+        totalOperations:
+          type: integer
+        byAlgorithm:
+          type: object
+          additionalProperties:
+            type: integer
+        byMode:
+          type: object
+          additionalProperties:
+            type: integer
+        mostUsedAlgorithm:
+          type: string
+      required:
+        - totalOperations
+        - byAlgorithm
+        - byMode
+        - mostUsedAlgorithm
+
+    SuccessResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+      required:
+        - success
+        - message
+
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+        message:
+          type: string
+      required:
+        - error
+        - message

@@ -1,0 +1,31 @@
+kind = "web"
+previewPath = "/"
+title = "WiZzryptic"
+version = "1.0.0"
+id = "artifacts/wizzryptic"
+router = "path"
+
+[[integratedSkills]]
+name = "react-vite"
+version = "1.0.0"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 21412
+
+[services.development]
+run = "pnpm --filter @workspace/wizzryptic run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/wizzryptic", "run", "build" ]
+publicDir = "artifacts/wizzryptic/dist/public"
+serve = "static"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "21412"
+BASE_PATH = "/"
